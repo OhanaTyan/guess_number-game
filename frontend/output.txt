@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		    <title>猜数游戏</title>
+			    <style>
+				        body {
+						            font-family: Arial, sans-serif;
+						            display: flex;
+						            justify-content: center;
+						            align-items: center;
+						            height: 100vh;
+						            margin: 0;
+						            background-color: #f0f0f0;
+						        }
+      .chat-container {
+		            width: 400px;
+		            border: 1px solid #ccc;
+		            border-radius: 10px;
+		            overflow: hidden;
+		            display: flex;
+		            flex-direction: column;
+		            background-color: #fff;
+		        }
+      .chat-header {
+		            background-color: #007bff;
+		            color: #fff;
+		            padding: 10px;
+		            text-align: center;
+		        }
+      .chat-messages {
+		            flex: 1;
+		            padding: 10px;
+		            overflow-y: auto;
+		        }
+      .chat-input {
+		            display: flex;
+		            border-top: 1px solid #ccc;
+		        }
+      .chat-input input {
+		            flex: 1;
+		            padding: 10px;
+		            border: none;
+		            outline: none;
+		        }
+      .chat-input button {
+		            padding: 10px;
+		            border: none;
+		            background-color: #007bff;
+		            color: #fff;
+		            cursor: pointer;
+		        }
+      .chat-input button:hover {
+		            background-color: #0056b3;
+		        }
+      .message {
+		            margin-bottom: 10px;
+		            padding: 5px 10px;
+		            border-radius: 5px;
+		            background-color: #e0e0e0;
+		        }
+  </style>
+	</head>
+	<body>
+	    <div class="chat-container">
+		        <div class="chat-header">猜数游戏</div>
+				        <div class="chat-messages" id="chat-messages">
+						            <!-- 消息将在这里显示 -->
+									        </div>
+											        <div class="chat-input">
+													            <input type="text" id="message-input" placeholder="输入消息...">
+																            <button onclick="sendMessage()">发送</button>
+																			        </div>
+																					    </div>
+																						
+																						    <script>
+																							        let timeoutId;
+																									
+																									        function sendMessage() {
+																											            const input = document.getElementById('message-input');
+																														            const message = input.value.trim();
+																																	            if (message) {
+																																				                const messagesContainer = document.getElementById('chat-messages');
+																																								                const messageElement = document.createElement('div');
+																																												                messageElement.classList.add('message');
+																																																                messageElement.textContent = message;
+																																																				                messagesContainer.appendChild(messageElement);
+																																																								                input.value = '';
+																																																												                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+																																																																
+																																																																                // 向后端发送消息
+																																																																                fetch('/backend/guess_number', {
+																																																																						                    method: 'POST',
+																																																																											                    headers: {
+																																																																																                        'Content-Type': 'application/json'
+																																																																																						                    },
+																																																																																											                    body: JSON.stringify({ message: message })
+																																																																																																                }).then(response => response.json())
+																																																																				                  .then(data => {
+																																																																										                        if (data.success) {
+																																																																																                          // 启动定时器等待后端回复
+																																																																																                          startTimer();
+																																																																																						                        } else {
+																																																																																												                          alert('消息发送失败');
+																																																																																																		                        }
+																																																																																																								                  }).catch(error => {
+																																																																																																													                        console.error('发送消息时出错:', error);
+																																																																																																																			                      alert('消息发送失败');
+																																																																																																																								                    });
+																																																																								              }
+																																				        }
+
+      function startTimer() {
+		            clearTimeout(timeoutId);
+					            timeoutId = setTimeout(() => {
+										                alert('10秒内未收到回复，聊天结束');
+														                location.reload();
+																		            }, 10000);
+								        }
+
+      // 模拟后端发送消息到前端
+      function receiveMessage(message) {
+		            const messagesContainer = document.getElementById('chat-messages');
+					            const messageElement = document.createElement('div');
+								            messageElement.classList.add('message');
+											            messageElement.textContent = message;
+														            messagesContainer.appendChild(messageElement);
+																	            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+																				            clearTimeout(timeoutId);
+																							        }
+
+      // 模拟后端发送消息到前端
+      setTimeout(() => {
+				            receiveMessage('这是后端回复的消息');
+							        }, 5000); // 5秒后模拟后端回复
+
+      document.getElementById('message-input').addEventListener('keypress', function(event) {
+				            if (event.key === 'Enter') {
+							                sendMessage();
+											            }
+														        });
+  </script>
+	</body>
+	</html> 
