@@ -1,11 +1,12 @@
 
 
+
 var message_id = 0;
 var message;
 
 
 function sendMessage() {
-    const backendUrl = "https://47.95.31.91:10040/guess_number"
+    const backendUrl = "http://47.95.31.91:10040/guess_number"
 
     // 从输入框获取用户输入
     var message_input = document.getElementById('message-input');
@@ -23,9 +24,12 @@ function sendMessage() {
 
     // 发送信息到后端
     fetch(backendUrl+`?${params.toString()}`, {
-        method: 'POST',
+        method: 'post',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+
         headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'form-data',
         }
     }).then(response => {
         if (!response.ok){
@@ -34,6 +38,10 @@ function sendMessage() {
         return response.json();
     }).then(data => {
         console.log(data);
+        message_id = data.message_id;
+        // TODO: 这儿谁爱弄谁弄吧
+        // 显示服务器返回的消息
+
     }).catch(error => {
         console.error('There was a problem with the fetch operation:', error);
     })
